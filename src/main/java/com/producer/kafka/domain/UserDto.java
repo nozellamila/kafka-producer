@@ -1,8 +1,8 @@
 package com.producer.kafka.domain;
 
 public class UserDto {
-    public String idade;
-    public String nome;
-    public String escala_udprs;
-    public String perfil;
+    private Integer age;
+    private String name;
+    private Integer udprs_level;
+    private String profile;
 }
