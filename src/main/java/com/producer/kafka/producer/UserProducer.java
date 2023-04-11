@@ -1,23 +1,37 @@
 package com.producer.kafka.producer;
 
+import com.producer.kafka.domain.UserDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-@Component
+@Service
 public class UserProducer {
     @Value("${users.topic}")
     private String userTopic;
 
     @Autowired
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    private KafkaTemplate<String, UserDto> kafkaTemplate;
 
-    public void send(final @RequestBody Object user) {
-        final String mensageKey = UUID.randomUUID().toString();
-        kafkaTemplate.send(userTopic, mensageKey, user);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserProducer.class);
+
+    public void send(UserDto user) {
+
+        LOGGER.info(String.format("Enviando mensagem: %s", user.toString()));
+
+        Message<UserDto> message = MessageBuilder
+                .withPayload(user)
+                .setHeader(KafkaHeaders.TOPIC, userTopic)
+                .build();
+
+        kafkaTemplate.send(message);
     }
 }
